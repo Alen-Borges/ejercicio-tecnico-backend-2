@@ -1,6 +1,6 @@
 ---
 id: SPEC-004
-status: DRAFT
+status: APPROVED
 feature: f4-reportes-estado-cuenta
 created: 2026-05-09
 updated: 2026-05-09

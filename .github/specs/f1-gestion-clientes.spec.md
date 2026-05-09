@@ -1,6 +1,6 @@
 ---
 id: SPEC-001
-status: DRAFT
+status: APPROVED
 feature: f1-gestion-clientes
 created: 2026-05-09
 updated: 2026-05-09

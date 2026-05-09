@@ -1,6 +1,6 @@
 ---
 id: SPEC-005
-status: DRAFT
+status: APPROVED
 feature: infra-microservicios-asincronos
 created: 2026-05-09
 updated: 2026-05-09

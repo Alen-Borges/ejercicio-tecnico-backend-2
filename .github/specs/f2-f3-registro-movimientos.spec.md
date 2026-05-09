@@ -1,6 +1,6 @@
 ---
 id: SPEC-003
-status: DRAFT
+status: APPROVED
 feature: f2-f3-registro-movimientos
 created: 2026-05-09
 updated: 2026-05-09
