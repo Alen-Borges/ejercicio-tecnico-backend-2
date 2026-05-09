@@ -37,6 +37,7 @@ public class ClienteService {
     @Transactional(readOnly = true)
     public List<ClienteResponse> findAll() {
         return clienteRepository.findAll().stream()
+                .filter(Cliente::getEstado) // Solo clientes activos
                 .map(clienteMapper::toResponse)
                 .collect(Collectors.toList());
     }
@@ -67,9 +68,9 @@ public class ClienteService {
 
     @Transactional
     public void delete(Long id) {
-        if (!clienteRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar. Cliente no encontrado con ID: " + id);
-        }
-        clienteRepository.deleteById(id);
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
+        cliente.setEstado(false); // Baja lógica
+        clienteRepository.save(cliente);
     }
 }
