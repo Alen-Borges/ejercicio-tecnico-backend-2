@@ -6,7 +6,7 @@ Sistema bancario con dos microservicios para gestión de clientes, cuentas y mov
 
 ## ¿Qué necesitás para correrlo?
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y corriendo
+- Docker instalado y corriendo
 - Nada más.
 
 ---
