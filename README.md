@@ -1,119 +1,66 @@
-# 🏦 Banking API — Prueba Técnica Microservicios
+# Banking API — Microservicios
 
-Sistema bancario construido con arquitectura de **microservicios**, diseñado para gestionar clientes, cuentas y movimientos de manera segura y escalable.
-
----
-
-## 📐 Arquitectura
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                     Docker Network                        │
-│                                                          │
-│  ┌──────────────┐    RabbitMQ     ┌────────────────────┐│
-│  │  ms-clientes │◄───(eventos)───►│    ms-cuentas      ││
-│  │  Puerto 8081 │                 │    Puerto 8082      ││
-│  └──────┬───────┘                 └────────┬───────────┘│
-│         │                                  │            │
-│  ┌──────▼───────┐                 ┌────────▼───────────┐│
-│  │  db-clientes │                 │    db-cuentas      ││
-│  │  PostgreSQL  │                 │    PostgreSQL       ││
-│  │  Puerto 5433 │                 │    Puerto 5434      ││
-│  └──────────────┘                 └────────────────────┘│
-│                                                          │
-│              ┌────────────────────┐                      │
-│              │      RabbitMQ      │                      │
-│              │  Puerto 5672       │                      │
-│              │  Console: 15672    │                      │
-│              └────────────────────┘                      │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Microservicios
-
-| Servicio | Responsabilidad | Puerto |
-|---|---|---|
-| `ms-clientes` | CRUD de Personas y Clientes | 8081 |
-| `ms-cuentas` | Cuentas, Movimientos y Reportes | 8082 |
-
-### Comunicación Asincrónica
-Cuando un **Cliente es actualizado** en `ms-clientes`, se publica un evento en **RabbitMQ** que `ms-cuentas` consume para sincronizar su caché local de nombres de clientes (usada en reportes).
+Sistema bancario con dos microservicios para gestión de clientes, cuentas y movimientos.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## ¿Qué necesitás para correrlo?
 
-- **Java 21** + **Spring Boot 3.2**
-- **Spring Data JPA** + **PostgreSQL** (base de datos relacional por microservicio)
-- **Spring AMQP** + **RabbitMQ** (comunicación asincrónica)
-- **Lombok** (reducción de boilerplate)
-- **Docker** + **Docker Compose** (despliegue)
-- **Serenity BDD** + **Cucumber** (pruebas de integración)
-- **JUnit 5** (pruebas unitarias)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y corriendo
+- Nada más.
 
 ---
 
-## 📋 Funcionalidades Implementadas
+## Cómo levantar el proyecto
 
-| Feature | Descripción | Estado |
-|---|---|---|
-| **F1** | CRUD Clientes, Cuentas y Movimientos | ✅ |
-| **F2** | Registro de movimientos con actualización de saldo | ✅ |
-| **F3** | Manejo de error "Saldo no disponible" | ✅ |
-| **F4** | Reporte estado de cuenta por rango de fechas y cliente | ✅ |
-| **F5** | Prueba unitaria de entidad `Cliente` | ✅ |
-| **F6** | Pruebas de integración con Serenity BDD / Cucumber | ✅ |
-| **F7** | Despliegue completo en contenedores Docker | ✅ |
-
----
-
-## 🚀 Instrucciones de Despliegue
-
-### Pre-requisitos
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado y en ejecución
-- Git
-
-### 1. Clonar el repositorio
 ```bash
 git clone <URL_DEL_REPOSITORIO>
 cd ejercicio-tecnico-backend-2
-```
-
-### 2. Levantar todos los servicios
-```bash
 docker compose up --build
 ```
 
-> La primera vez puede tardar varios minutos ya que descargará las imágenes de PostgreSQL, RabbitMQ y compilará los microservicios.
-
-### 3. Verificar que los servicios están en línea
-
-| Servicio | URL | Credenciales |
-|---|---|---|
-| API Clientes | http://localhost:8081 | — |
-| API Cuentas | http://localhost:8082 | — |
-| RabbitMQ Console | http://localhost:15672 | guest / guest |
-
-### 4. Bajar los servicios
-```bash
-docker compose down
-```
+La primera vez tarda unos minutos. Cuando veas que ambos servicios arrancan sin errores, el sistema está listo.
 
 ---
 
-## 📡 Endpoints API
+## URLs disponibles
 
-### Microservicio de Clientes (`localhost:8081`)
+| Servicio | URL |
+|---|---|
+| API Clientes | http://localhost:8081 |
+| API Cuentas y Movimientos | http://localhost:8082 |
+| RabbitMQ (panel web) | http://localhost:15672 (usuario: `guest`, contraseña: `guest`) |
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| `GET` | `/clientes` | Listar todos los clientes |
-| `GET` | `/clientes/{id}` | Obtener cliente por ID |
-| `POST` | `/clientes` | Crear nuevo cliente |
-| `PUT` | `/clientes/{id}` | Actualizar cliente |
-| `DELETE` | `/clientes/{id}` | Eliminar cliente |
+---
 
-**Ejemplo — Crear cliente:**
+## Cómo probar los endpoints
+
+Importá el archivo `Banking_API_Consolidada.postman_collection.json` en Postman.
+
+Antes de correr los requests, creá un **entorno** en Postman con estas dos variables:
+
+| Variable | Valor |
+|---|---|
+| `baseUrlClientes` | `http://localhost:8081` |
+| `baseUrlCuentas` | `http://localhost:8082` |
+
+La colección ya tiene todos los requests ordenados en un flujo lógico: primero creás clientes, luego cuentas, después movimientos, y por último consultás reportes.
+
+---
+
+## Endpoints disponibles
+
+### Clientes — `http://localhost:8081`
+
+```
+GET    /clientes           → lista todos
+GET    /clientes/{id}      → trae uno por ID
+POST   /clientes           → crea uno
+PUT    /clientes/{id}      → actualiza
+DELETE /clientes/{id}      → elimina
+```
+
+**Crear cliente:**
 ```json
 POST /clientes
 {
@@ -130,20 +77,17 @@ POST /clientes
 
 ---
 
-### Microservicio de Cuentas (`localhost:8082`)
+### Cuentas — `http://localhost:8082`
 
-| Método | Endpoint | Descripción |
-|---|---|---|
-| `GET` | `/cuentas` | Listar todas las cuentas |
-| `GET` | `/cuentas/{id}` | Obtener cuenta por ID |
-| `POST` | `/cuentas` | Crear nueva cuenta |
-| `PUT` | `/cuentas/{id}` | Actualizar cuenta |
-| `DELETE` | `/cuentas/{id}` | Eliminar cuenta |
-| `GET` | `/movimientos` | Listar movimientos |
-| `POST` | `/movimientos` | Registrar movimiento |
-| `GET` | `/reportes` | Reporte por fechas y cliente |
+```
+GET    /cuentas            → lista todas
+GET    /cuentas/{id}       → trae una por ID
+POST   /cuentas            → crea una
+PUT    /cuentas/{id}       → actualiza
+DELETE /cuentas/{id}       → elimina
+```
 
-**Ejemplo — Crear cuenta:**
+**Crear cuenta:**
 ```json
 POST /cuentas
 {
@@ -155,7 +99,16 @@ POST /cuentas
 }
 ```
 
-**Ejemplo — Registrar movimiento (retiro):**
+---
+
+### Movimientos — `http://localhost:8082`
+
+```
+GET    /movimientos        → lista todos
+POST   /movimientos        → registra uno nuevo
+```
+
+**Registrar un retiro** (valor negativo):
 ```json
 POST /movimientos
 {
@@ -163,14 +116,36 @@ POST /movimientos
   "valor": -575
 }
 ```
-> Los valores **negativos** son retiros y **positivos** son depósitos.
 
-**Ejemplo — Obtener reporte:**
+**Registrar un depósito** (valor positivo):
+```json
+POST /movimientos
+{
+  "numeroCuenta": "478758",
+  "valor": 600
+}
+```
+
+Si no hay saldo suficiente para el retiro, el sistema responde:
+```json
+HTTP 400
+{ "message": "Saldo no disponible" }
+```
+
+---
+
+### Reportes — `http://localhost:8082`
+
+```
+GET /reportes?fecha=YYYY-MM-DD,YYYY-MM-DD&cliente={id}
+```
+
+**Ejemplo:**
 ```
 GET /reportes?fecha=2024-01-01,2024-12-31&cliente=1
 ```
 
-**Respuesta del reporte:**
+**Respuesta:**
 ```json
 [
   {
@@ -188,109 +163,13 @@ GET /reportes?fecha=2024-01-01,2024-12-31&cliente=1
 
 ---
 
-## ⚠️ Manejo de Errores
+## Cómo bajar el proyecto
 
-Todos los errores se retornan en formato JSON con código HTTP apropiado:
-
-| Escenario | HTTP | Respuesta |
-|---|---|---|
-| Saldo insuficiente para retiro | `400` | `{ "message": "Saldo no disponible" }` |
-| Cuenta no encontrada | `400` | `{ "message": "Cuenta no encontrada" }` |
-| Error interno del servidor | `500` | `{ "message": "Error interno del servidor" }` |
-
----
-
-## 🧪 Ejecución de Pruebas
-
-### Pruebas Unitarias (ms-clientes)
 ```bash
-cd cliente-service
-mvn test
+docker compose down
 ```
-Valida la entidad de dominio `Cliente` con 2 casos de prueba.
 
-### Pruebas de Integración + Serenity BDD (ms-cuentas)
+Para borrar también los datos de la base:
 ```bash
-cd cuenta-movimiento-service
-mvn clean verify
-```
-
-Ejecuta:
-1. `MovimientoIntegrationTest` — prueba de integración Spring Boot
-2. Escenarios Serenity / Cucumber:
-   - ✅ Realizar un depósito exitoso
-   - ✅ Realizar un retiro exitoso
-   - ✅ Intento de retiro con saldo insuficiente
-
-**Ver el reporte HTML de Serenity:**
-```
-cuenta-movimiento-service/target/site/serenity/index.html
-```
-
-> ⚠️ Las pruebas son **autónomas**: usan H2 en memoria y no requieren Docker activo.
-
----
-
-## 🗄️ Base de Datos
-
-El script de inicialización se encuentra en `BaseDatos.sql` en la raíz del proyecto.  
-Se ejecuta automáticamente al levantar el contenedor `db-clientes` con Docker Compose.
-
----
-
-## 📮 Colección Postman
-
-Importar el archivo `Banking_API_Consolidada.postman_collection.json` en Postman.
-
-La colección incluye todos los endpoints ordenados en un flujo lógico:
-1. Crear cliente
-2. Crear cuentas
-3. Registrar movimientos
-4. Consultar reporte
-5. Casos de error (saldo insuficiente)
-
-**Variables de entorno requeridas:**
-
-| Variable | Valor |
-|---|---|
-| `baseUrlClientes` | `http://localhost:8081` |
-| `baseUrlCuentas` | `http://localhost:8082` |
-
----
-
-## 🏗️ Estructura del Proyecto
-
-```
-ejercicio-tecnico-backend-2/
-├── cliente-service/                 # Microservicio de Clientes (MS1)
-│   └── src/
-│       ├── main/java/.../cliente/
-│       │   ├── controller/          # REST Controllers
-│       │   ├── service/             # Lógica de negocio
-│       │   ├── repository/          # Spring Data JPA
-│       │   ├── model/entity/        # Persona (MappedSuperclass), Cliente
-│       │   ├── model/dto/           # DTOs Request/Response
-│       │   ├── mapper/              # Conversión Entity <-> DTO
-│       │   ├── config/              # RabbitMQ Configuration
-│       │   └── exception/           # GlobalExceptionHandler
-│       └── test/java/               # ClienteTest (F5)
-│
-├── cuenta-movimiento-service/       # Microservicio de Cuentas (MS2)
-│   └── src/
-│       ├── main/java/.../cuenta/
-│       │   ├── controller/          # CuentaController, MovimientoController, ReporteController
-│       │   ├── service/             # CuentaService, MovimientoService
-│       │   ├── repository/          # CuentaRepository, MovimientoRepository
-│       │   ├── model/entity/        # Cuenta, Movimiento, Cliente (caché local)
-│       │   ├── config/              # RabbitMQ Consumer
-│       │   └── exception/           # InsufficientBalanceException, GlobalExceptionHandler
-│       └── test/
-│           ├── java/.../integration/  # MovimientoIntegrationTest (F6)
-│           ├── java/.../glue/         # Serenity Step Definitions
-│           ├── java/.../runners/      # Cucumber Runner
-│           └── resources/features/   # movimientos.feature (Gherkin)
-│
-├── docker-compose.yml               # Orquestación de 5 servicios
-├── BaseDatos.sql                    # Script de inicialización de BD
-└── Banking_API_Consolidada.postman_collection.json
+docker compose down -v
 ```
