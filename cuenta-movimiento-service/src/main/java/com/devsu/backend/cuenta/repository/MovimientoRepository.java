@@ -1,7 +1,9 @@
 package com.devsu.backend.cuenta.repository;
 
+import com.devsu.backend.cuenta.model.entity.Cuenta;
 import com.devsu.backend.cuenta.model.entity.Movimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Repository
 public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
+
+    List<Movimiento> findByCuenta(Cuenta cuenta);
 
     @Query("SELECT m FROM Movimiento m WHERE m.cuenta.clienteId = :clienteId " +
            "AND m.fecha BETWEEN :startDate AND :endDate ORDER BY m.fecha DESC")
