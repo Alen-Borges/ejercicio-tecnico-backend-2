@@ -375,7 +375,7 @@
 					"response": []
 				},
 				{
-					"name": "Error: Saldo Insuficiente",
+					"name": "Error: Saldo No Disponible",
 					"event": [
 						{
 							"listen": "test",
@@ -387,7 +387,7 @@
 									"",
 									"pm.test(\"Mensaje de error correcto\", function () {",
 									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData.message).to.eql(\"Saldo insuficiente\");",
+									"    pm.expect(jsonData.message).to.eql(\"Saldo no disponible\");",
 									"});"
 								],
 								"type": "text/javascript"

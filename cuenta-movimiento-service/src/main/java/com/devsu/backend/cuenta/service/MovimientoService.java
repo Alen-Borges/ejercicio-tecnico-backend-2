@@ -47,7 +47,7 @@ public class MovimientoService {
 
         // F3: Validación de Saldo Disponible
         if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {
-            throw new InsufficientBalanceException("Saldo insuficiente");
+            throw new InsufficientBalanceException("Saldo no disponible");
         }
 
         // Crear Movimiento
