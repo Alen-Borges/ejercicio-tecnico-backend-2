@@ -7,6 +7,7 @@ import com.devsu.backend.cuenta.model.dto.MovimientoResponse;
 import com.devsu.backend.cuenta.model.dto.ReporteResponse;
 import com.devsu.backend.cuenta.model.entity.Cuenta;
 import com.devsu.backend.cuenta.model.entity.Movimiento;
+import com.devsu.backend.cuenta.repository.ClienteRepository;
 import com.devsu.backend.cuenta.repository.CuentaRepository;
 import com.devsu.backend.cuenta.repository.MovimientoRepository;
 import org.springframework.stereotype.Service;
@@ -23,13 +24,16 @@ public class MovimientoService {
 
     private final MovimientoRepository movimientoRepository;
     private final CuentaRepository cuentaRepository;
+    private final ClienteRepository clienteRepository;
     private final MovimientoMapper movimientoMapper;
 
     public MovimientoService(MovimientoRepository movimientoRepository, 
                              CuentaRepository cuentaRepository, 
+                             ClienteRepository clienteRepository,
                              MovimientoMapper movimientoMapper) {
         this.movimientoRepository = movimientoRepository;
         this.cuentaRepository = cuentaRepository;
+        this.clienteRepository = clienteRepository;
         this.movimientoMapper = movimientoMapper;
     }
 
@@ -43,7 +47,7 @@ public class MovimientoService {
 
         // F3: Validación de Saldo Disponible
         if (nuevoSaldo.compareTo(BigDecimal.ZERO) < 0) {
-            throw new InsufficientBalanceException("Saldo no disponible");
+            throw new InsufficientBalanceException("Saldo insuficiente");
         }
 
         // Crear Movimiento
@@ -66,11 +70,15 @@ public class MovimientoService {
     public List<ReporteResponse> getReporte(Long clienteId, LocalDateTime start, LocalDateTime end) {
         List<Movimiento> movimientos = movimientoRepository.findByClienteIdAndFechaBetween(clienteId, start, end);
         
+        String nombreCliente = clienteRepository.findById(clienteId)
+                .map(com.devsu.backend.cuenta.model.entity.Cliente::getNombre)
+                .orElse("Cliente " + clienteId);
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         return movimientos.stream().map(m -> new ReporteResponse(
                 m.getFecha().format(formatter),
-                "Cliente ID: " + m.getCuenta().getClienteId(), // Placeholder hasta integración con RabbitMQ
+                nombreCliente,
                 m.getCuenta().getNumeroCuenta(),
                 m.getCuenta().getTipoCuenta(),
                 m.getSaldo().subtract(m.getValor()), // Saldo inicial antes del movimiento

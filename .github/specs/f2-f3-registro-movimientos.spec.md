@@ -22,7 +22,7 @@ Implementar el registro de movimientos (débitos y créditos) en las cuentas ban
 
 ### Requerimiento de Negocio
 - **F2**: Registro de movimientos positivos (depósitos) o negativos (retiros). Actualización de saldo.
-- **F3**: Si no hay saldo suficiente para un retiro, lanzar error "Saldo no disponible".
+- **F3**: Si no hay saldo suficiente para un retiro, lanzar error "Saldo insuficiente".
 - **Movimiento**: Fecha, tipo movimiento, valor, saldo (disponible después del movimiento).
 
 ### Historias de Usuario
@@ -62,7 +62,7 @@ CRITERIO-3.2: Retiro exitoso
 CRITERIO-3.3: Retiro con saldo insuficiente
   Dado que:  la cuenta "495878" tiene un saldo de 0
   Cuando:    intento retirar 100
-  Entonces:  el sistema no registra el movimiento y retorna error 400 con el mensaje "Saldo no disponible"
+  Entonces:  el sistema no registra el movimiento y retorna error 400 con el mensaje "Saldo insuficiente"
 ```
 
 ### Reglas de Negocio
@@ -124,4 +124,4 @@ CRITERIO-3.3: Retiro con saldo insuficiente
 #### Tests Backend
 - [ ] `testRegisterDepositSuccess`: Happy path depósito.
 - [ ] `testRegisterWithdrawSuccess`: Happy path retiro.
-- [ ] `testInsufficientBalance`: Verificar mensaje "Saldo no disponible".
+- [ ] `testInsufficientBalance`: Verificar mensaje "Saldo insuficiente".

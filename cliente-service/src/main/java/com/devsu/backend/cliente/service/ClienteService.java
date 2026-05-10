@@ -4,7 +4,9 @@ import com.devsu.backend.cliente.mapper.ClienteMapper;
 import com.devsu.backend.cliente.model.dto.ClienteRequest;
 import com.devsu.backend.cliente.model.dto.ClienteResponse;
 import com.devsu.backend.cliente.model.entity.Cliente;
+import com.devsu.backend.cliente.model.dto.ClienteEvent;
 import com.devsu.backend.cliente.repository.ClienteRepository;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,10 +18,12 @@ public class ClienteService {
 
     private final ClienteRepository clienteRepository;
     private final ClienteMapper clienteMapper;
+    private final RabbitTemplate rabbitTemplate;
 
-    public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper) {
+    public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper, RabbitTemplate rabbitTemplate) {
         this.clienteRepository = clienteRepository;
         this.clienteMapper = clienteMapper;
+        this.rabbitTemplate = rabbitTemplate;
     }
 
     @Transactional
@@ -31,6 +35,11 @@ public class ClienteService {
 
         Cliente cliente = clienteMapper.toEntity(request);
         Cliente savedCliente = clienteRepository.save(cliente);
+
+        // Publicar evento
+        rabbitTemplate.convertAndSend("customer.exchange", "customer.created", 
+                new ClienteEvent(savedCliente.getId(), savedCliente.getNombre(), savedCliente.getIdentificacion(), savedCliente.getEstado()));
+
         return clienteMapper.toResponse(savedCliente);
     }
 
@@ -63,6 +72,11 @@ public class ClienteService {
         cliente.setEstado(request.estado());
 
         Cliente updatedCliente = clienteRepository.save(cliente);
+
+        // Publicar evento de actualización
+        rabbitTemplate.convertAndSend("customer.exchange", "customer.created", 
+                new ClienteEvent(updatedCliente.getId(), updatedCliente.getNombre(), updatedCliente.getIdentificacion(), updatedCliente.getEstado()));
+
         return clienteMapper.toResponse(updatedCliente);
     }
 
