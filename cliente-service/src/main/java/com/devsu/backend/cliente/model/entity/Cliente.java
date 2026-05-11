@@ -21,6 +21,9 @@ public class Cliente extends Persona {
     @Column(unique = true, nullable = false)
     private String clienteid;
 
+    @Column(nullable = false)
     private String contrasena;
+
+    @Column(nullable = false)
     private Boolean estado;
 }

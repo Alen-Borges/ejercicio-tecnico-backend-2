@@ -23,12 +23,13 @@ public class Cuenta {
     @Column(name = "numero_cuenta", unique = true, nullable = false)
     private String numeroCuenta;
 
-    @Column(name = "tipo_cuenta")
+    @Column(name = "tipo_cuenta", nullable = false)
     private String tipoCuenta;
 
-    @Column(name = "saldo_inicial")
+    @Column(name = "saldo_inicial", nullable = false)
     private BigDecimal saldoInicial;
 
+    @Column(nullable = false)
     private Boolean estado;
 
     @Column(name = "cliente_id")

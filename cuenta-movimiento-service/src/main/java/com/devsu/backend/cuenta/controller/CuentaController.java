@@ -30,6 +30,16 @@ public class CuentaController {
         return ResponseEntity.ok(cuentaService.findAll());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CuentaResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(cuentaService.findById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CuentaResponse> update(@PathVariable Long id, @Valid @RequestBody CuentaRequest request) {
+        return ResponseEntity.ok(cuentaService.update(id, request));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         cuentaService.delete(id);
