@@ -46,6 +46,27 @@ public class CuentaService {
         return cuentaMapper.toResponse(cuenta);
     }
 
+    @Transactional(readOnly = true)
+    public CuentaResponse findById(Long id) {
+        Cuenta cuenta = cuentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada con ID: " + id));
+        return cuentaMapper.toResponse(cuenta);
+    }
+
+    @Transactional
+    public CuentaResponse update(Long id, CuentaRequest request) {
+        Cuenta cuenta = cuentaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cuenta no encontrada con ID: " + id));
+        
+        cuenta.setNumeroCuenta(request.numeroCuenta());
+        cuenta.setTipoCuenta(request.tipoCuenta());
+        cuenta.setSaldoInicial(request.saldoInicial());
+        cuenta.setEstado(request.estado());
+        cuenta.setClienteId(request.clienteId());
+
+        return cuentaMapper.toResponse(cuentaRepository.save(cuenta));
+    }
+
     @Transactional
     public void delete(Long id) {
         Cuenta cuenta = cuentaRepository.findById(id)
